@@ -13,7 +13,7 @@ rails generate migration add_permalink_to_post permalink:string
 
 
 # post.rb file in models
-
+```
 class Post < ActiveRecord::Base
  
  	validates_uniqueness_of :permalink
@@ -45,7 +45,7 @@ end
 			end 
 		end
   end
-
+```
 Running rake task command : rake update_permalink
 
 
@@ -60,7 +60,7 @@ For information on the Luhn algorithm:
 http://en.wikipedia.org/wiki/Luhn_algorithm
 
 # creditcard_validate.rb file in lib directory
-
+```
 class CreditcardValidate
 
 	# Checks Luhn checksum 
@@ -90,7 +90,7 @@ class CreditcardValidate
 	end
 
 end
-
+```
 
 
 
@@ -121,13 +121,13 @@ help you in the task.
 Ideally, your solution should be re­usable, so that the actual logic of updating the Payment
 could be separated from all the details of how you
 implement serializability.Here's an example of how your code could be included into the older (non­race free) code:
-# we received a payment with line_item_id and service_id from external API
+`# we received a payment with line_item_id and service_id from external API
 # if such payment has already been seen, we should access the existing object
 # if no such payment exists in our db yet, create it
 # in both cases the block parameter payment should be the payment object
 # which the block code will update with data received or whatever
 Payment.with(:line_item_id => line_item_id, :service_id => service_id) do |payment|
-# the bulk of old code here ­ just updating the payment data here
+# the bulk of old code here ­ just updating the payment data here`
 end
 The idea is that Payment.with should just incapsulate any logic required to prevent multiple
 objects creation/finding,and the block code does more mundane tasks such as actually updating
@@ -143,7 +143,7 @@ wait their turn and use that exact payment object for update.
 
 
 payment.rb file in models
-
+```
 class Payment < ActiveRecord::Base
   #belongs_to :service
   # Using a transation to stop the race condition
@@ -153,6 +153,6 @@ class Payment < ActiveRecord::Base
     end
   end
 end
-
+```
 
 
