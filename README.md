@@ -38,8 +38,7 @@ end
   task :update_permalink => :environment do
 		Post.all.find_each do |post|
 			post.update_permalink
-			saved = post.save
-			if !saved
+			if !post.save
 				post.update_permalink(true)
 				post.save
 			end 
@@ -92,6 +91,20 @@ class CreditcardValidate
 end
 ```
 
+TO Check
+In Rails console :
+
+```
+2.1.2 :002 > require 'creditcard_validate.rb' # Requiring the lib file
+2.1.2 :023 > CreditcardValidate.generate_credit_card_with_luhn(37828224631000) # Attaching luhn checksum to a credit card  
+ => 378282246310005 
+2.1.2 :024 > CreditcardValidate.check_credit_card_with_luhn(378282246310005) # Validating the credit card
+ => true 
+2.1.2 :025 > CreditcardValidate.check_credit_card_with_luhn(371449635398431) # Validating a valid credit card
+ => true 
+2.1.2 :026 > CreditcardValidate.check_credit_card_with_luhn(371449635398433) # Validating an invalid credit card
+ => false
+```
 
 
 Task 3:
@@ -105,9 +118,11 @@ Assume that you are already given an ActiveRecord object (and underlying table) 
 representing a payment.
 It was already designed by another team member, it has been deployed and is being actively
 used in production.
+```
 class Payment < ActiveRecord::Base
 belongs_to :service
 end
+```
 Initially the team of developers had ignored the possibility of races and did not provide any
 means of guarding against concurrent access to payments.
 However, then our app grew up to a point where multiple processes routinely poll this external
@@ -121,7 +136,8 @@ help you in the task.
 Ideally, your solution should be re­usable, so that the actual logic of updating the Payment
 could be separated from all the details of how you
 implement serializability.Here's an example of how your code could be included into the older (non­race free) code:
-`# we received a payment with line_item_id and service_id from external API
+```
+# we received a payment with line_item_id and service_id from external API
 # if such payment has already been seen, we should access the existing object
 # if no such payment exists in our db yet, create it
 # in both cases the block parameter payment should be the payment object
@@ -129,6 +145,7 @@ implement serializability.Here's an example of how your code could be included i
 Payment.with(:line_item_id => line_item_id, :service_id => service_id) do |payment|
 # the bulk of old code here ­ just updating the payment data here`
 end
+```
 The idea is that Payment.with should just incapsulate any logic required to prevent multiple
 objects creation/finding,and the block code does more mundane tasks such as actually updating
 the payment's other fields or determining if they need to be updated, etc
@@ -143,6 +160,7 @@ wait their turn and use that exact payment object for update.
 
 
 payment.rb file in models
+
 ```
 class Payment < ActiveRecord::Base
   #belongs_to :service
