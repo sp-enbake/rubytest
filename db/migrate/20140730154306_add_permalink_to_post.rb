@@ -5,7 +5,7 @@ class AddPermalinkToPost < ActiveRecord::Migration
   end
 private
   def update_permalink
-	  URL = "http://localhost:3000/"
+	  URL = "http://enbake-rortest.herokuapp.com/"
     post_titles = Post.all
     post_titles.each do |p_title|
       title = p_title.title.parameterize

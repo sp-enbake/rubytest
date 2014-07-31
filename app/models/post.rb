@@ -5,7 +5,7 @@ class Post < ActiveRecord::Base
  	before_save :update_permalink
 
 	# Dummy url
-	URL = "http://localhost:3000/"
+	URL = "http://enbake-rortest.herokuapp.com/"
 
 	# Creates a permalink 
 	def update_permalink
