@@ -62,6 +62,18 @@ class PostsController < ApplicationController
     end
   end
 
+  def check_credit_card
+    credit_card = params[:id]
+    status = Post.check_credit_card_with_luhn(credit_card) 
+    render :json => status, :status => 200, :content_type => 'text/html'
+  end  
+  
+  def generate_credit_card_checksum
+    credit_card = params[:id]
+    data = Post.generate_credit_card_with_luhn(credit_card) 
+    render :json => data, :status => 200, :content_type => 'text/html'
+  end 
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_post

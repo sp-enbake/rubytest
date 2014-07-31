@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  resources :posts
+  resources :posts do
+    member do 
+      get 'check_credit_card'
+      get 'generate_credit_card_checksum'
+    end
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
