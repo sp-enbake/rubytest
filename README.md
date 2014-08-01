@@ -7,45 +7,15 @@ convert title to become permalink, the only requirements being permalink must be
 on title, must be constructed of only URL valid characters, and must be unique (even if
 another Post has the same title and converts to the same permalink). 
 
-# To generate Miration file.
 
-rails generate migration add_permalink_to_post permalink:string
+You have to run rake db:migrate and it will take tile and convert it into permalink.
+I have also added a before_save callback which will update the permalink  object before saving.
 
+To get all the posts use this Curl command:
 
-# post.rb file in models
-```
-class Post < ActiveRecord::Base
- 
- 	validates_uniqueness_of :permalink
+curl --header "Content-Type:application/json" --header "Accept:application/json" http://enbake-rortest.herokuapp.com/posts -X GET
 
-	# Dummy url
-	URL = "http://localhost:3000/"
-
-	# Creates a permalink 
-	def update_permalink(random=false)
-		title = self.title.parameterize
-		if random
-			title+=rand(1 .. 50).to_s  
-		end 
-		self.permalink = URL+title
-	end
- 	
-end
-
-# update_permalink.rake file in lib/tasks directory 
-	
-  desc " Rake task to update permalinks"
-  task :update_permalink => :environment do
-		Post.all.find_each do |post|
-			post.update_permalink
-			if !post.save
-				post.update_permalink(true)
-				post.save
-			end 
-		end
-  end
-```
-Running rake task command : rake update_permalink
+To create A post use this link: http://enbake-rortest.herokuapp.com/posts/new
 
 
 Task 2:
@@ -58,53 +28,19 @@ number with the check digit appended on the end.
 For information on the Luhn algorithm:
 http://en.wikipedia.org/wiki/Luhn_algorithm
 
-# creditcard_validate.rb file in lib directory
-```
-class CreditcardValidate
 
-	# Checks Luhn checksum 
-	def self.check_credit_card_with_luhn(credit_card_number)
-	  digits = credit_card_number.to_s.scan(/./).map(&:to_i)
-	  check = digits.pop
+Use the following curl command:
+To check if the credit card is valid use this curl:
 
-	  sum = digits.reverse.each_slice(2).map do |x, y|
-	    [(x * 2).divmod(10), y || 0]
-	  end.flatten.inject(:+)
+curl --header "Content-Type:application/json" --header "Accept:application/json" http://enbake-rortest.herokuapp.com/posts/5555555555554444/check_credit_card -X GET
 
-	  (10 - sum % 10) == check
+Where 5555555555554444 is the credit card number.
 
-  end
-  # Generates Luhn checksum 
-	def self.generate_credit_card_with_luhn(credit_card_number)
-		digits = credit_card_number.to_s.reverse.scan(/\d/).map { |x| x.to_i }
-		digits = digits.each_with_index.map { |d, i|
-		d *= 2 if i.even?
-		d > 9 ? d - 9 : d
-		}
-		sum = digits.inject(0) { |m, x| m + x }
-		mod = 10 - sum % 10
-		mod==10 ? 0 : mod
-		(credit_card_number.to_s+mod.to_s).to_i
+To Generate the Checksum:
 
-	end
+curl --header "Content-Type:application/json" --header "Accept:application/json" http://enbake-rortest.herokuapp.com/posts/555555555555444/generate_credit_card_checksum -X GET
 
-end
-```
-
-TO Check
-In Rails console :
-
-```
-2.1.2 :002 > require 'creditcard_validate.rb' # Requiring the lib file
-2.1.2 :023 > CreditcardValidate.generate_credit_card_with_luhn(37828224631000) # Attaching luhn checksum to a credit card  
- => 378282246310005 
-2.1.2 :024 > CreditcardValidate.check_credit_card_with_luhn(378282246310005) # Validating the credit card
- => true 
-2.1.2 :025 > CreditcardValidate.check_credit_card_with_luhn(371449635398431) # Validating a valid credit card
- => true 
-2.1.2 :026 > CreditcardValidate.check_credit_card_with_luhn(371449635398433) # Validating an invalid credit card
- => false
-```
+Where 5555555555554444 is the credit card number.
 
 
 Task 3:
@@ -158,6 +94,8 @@ update the object and let the next one(s) do its(their) job.
 If the payment did not exist, one of the processes will create it and other processes should
 wait their turn and use that exact payment object for update.
 
+
+I have written a method(class method) named 'with'  in Payment Model which is using transaction to stop race condition. 
 
 payment.rb file in models
 
