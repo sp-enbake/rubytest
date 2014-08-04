@@ -8,8 +8,8 @@ on title, must be constructed of only URL valid characters, and must be unique (
 another Post has the same title and converts to the same permalink). 
 
 
-You have to run rake db:migrate and it will take tile and convert it into permalink.
-I have also added a before_save callback which will update the permalink  object before saving.
+You have to run rake db:migrate and it will take tile and convert it into permalink. I'm converting title into a url friendly string with the help of parameterize method and  appending post id to make it unique.
+I have also added a before_save callback which updated the permalink  object before saving.In before save I'm taking the last ID of the post and adding 1 to it to make it unique. 
 
 To get all the posts use this Curl command:
 
@@ -28,17 +28,19 @@ number with the check digit appended on the end.
 For information on the Luhn algorithm:
 http://en.wikipedia.org/wiki/Luhn_algorithm
 
+For this task I have created a class Creditcard in lib directory with  two class methods valid? and append_check_digit. Valid checks if that credit card is valid or not using Luhn algorithm and  append_check_digit appends the checksum to the credit card number passed.
 
-Use the following curl command:
-To check if the credit card is valid use this curl:
+I have defined two methods in models so that you can test with following curl command:
 
-curl --header "Content-Type:application/json" --header "Accept:application/json" http://enbake-rortest.herokuapp.com/posts/5555555555554444/check_credit_card -X GET
+To check if the credit card is valid :
+
+curl --header "Content-Type:application/json" --header "Accept:application/json" http://enbake-rortest.herokuapp.com/posts/5555555555554444/valid_card -X GET
 
 Where 5555555555554444 is the credit card number.
 
 To Generate the Checksum:
 
-curl --header "Content-Type:application/json" --header "Accept:application/json" http://enbake-rortest.herokuapp.com/posts/555555555555444/generate_credit_card_checksum -X GET
+curl --header "Content-Type:application/json" --header "Accept:application/json" http://enbake-rortest.herokuapp.com/posts/555555555555444/append_card_checksum -X GET
 
 Where 5555555555554444 is the credit card number.
 
@@ -95,7 +97,7 @@ If the payment did not exist, one of the processes will create it and other proc
 wait their turn and use that exact payment object for update.
 
 
-I have written a method(class method) named 'with'  in Payment Model which is using transaction to stop race condition. 
+I have written a method(class method) named 'with'  in Payment Model which is using transaction with isolation level  Serializable to stop race condition. 
 
 payment.rb file in models
 
