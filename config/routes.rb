@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   resources :posts do
     member do 
-      get 'check_credit_card'
-      get 'generate_credit_card_checksum'
+      get 'valid_card'
+      get 'append_card_checksum'
     end
   end
 

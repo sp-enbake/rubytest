@@ -8,10 +8,9 @@ private
 	  URL = "http://enbake-rortest.herokuapp.com/"
     post_titles = Post.all
     post_titles.each do |p_title|
-      title = p_title.title.parameterize
-      title+=rand(1 .. 50).to_s
-	    perma_link = URL+title
-      p_title.update_attributes(:permalink=>row_perma)
-   end 
+      title =URL<<"#{p_title.title.parameterize}-#{p_title.id}"<<
+      p_title.update_attributes(:permalink=>title)
+    end
+  end 
 
 end

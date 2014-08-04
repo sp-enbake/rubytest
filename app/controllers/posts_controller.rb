@@ -62,15 +62,15 @@ class PostsController < ApplicationController
     end
   end
 
-  def check_credit_card
+  def valid_card
     credit_card = params[:id]
-    status = Post.check_credit_card_with_luhn(credit_card) 
+    status = Creditcard.valid?(credit_card) 
     render :json => status, :status => 200, :content_type => 'text/html'
   end  
   
-  def generate_credit_card_checksum
+  def append_card_checksum
     credit_card = params[:id]
-    data = Post.generate_credit_card_with_luhn(credit_card) 
+    data = Creditcard.append_check_digit(credit_card) 
     render :json => data, :status => 200, :content_type => 'text/html'
   end 
 
